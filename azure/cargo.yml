@@ -39,9 +39,11 @@ jobs:
         nix-build --show-trace -E 'with import ./. {}; ${{crate.attr}}.overrideAttrs(old: {dirty=true;})'
       displayName: build dirty
     - bash: |
-        for bin in $(find result/bin -type f -executable); do
-          ls -l $bin
-          $bin --help
+        for bin in $(find result/bin -type f); do
+          if [[ -x $bin ]]; then
+            ls -l $bin
+            $bin --help
+          fi
         done
       displayName: run dirty
       continueOnError: true
@@ -49,9 +51,11 @@ jobs:
         nix-build --show-trace . -A ${{crate.attr}}
       displayName: build
     - bash: |
-        for bin in $(find result/bin -type f -executable); do
-          ls -l $bin
-          $bin --help
+        for bin in $(find result/bin -type f); do
+          if [[ -x $bin ]]; then
+            ls -l $bin
+            $bin --help
+          fi
         done
       displayName: run
       continueOnError: true
