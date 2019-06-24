@@ -1,0 +1,44 @@
+jobs:
+- template: cargo.yml
+  parameters:
+    crates:
+    - attr: cargo-download
+      name: download
+    - attr: cargo-edit
+      name: edit
+    - attr: cargo-outdated
+      name: outdated
+    - attr: cargo-release
+      name: release
+    - attr: cargo-tree
+      name: tree
+    - attr: cargo-update
+      name: update
+    - attr: cargo-asm
+      name: asm
+    - attr: cargo-bloat
+      name: bloat
+    - attr: cargo-expand
+      name: expand
+    - attr: cargo-fuzz
+      name: fuzz
+    - attr: cargo-make
+      name: make
+    - attr: cargo-sweep
+      name: sweep
+    - attr: cargo-xbuild
+      name: xbuild
+    - attr: rustfmt
+      name: rustfmt
+    - attr: rls
+      name: rls
+    - attr: rustracer
+      name: racer
+    - attr: rustracerd
+      name: racerd
+    - attr: rust-bindgen
+      name: bindgen
+    - attr: rust-cbindgen
+      name: cbindgen
+    - attr: rustup
+      name: rustup

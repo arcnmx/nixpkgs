@@ -1,0 +1,57 @@
+parameters:
+  crates:
+  - cargo-outdated
+jobs:
+- ${{ each crate in parameters.crates }}:
+  - job: ${{crate.name}}
+    displayName: ${{crate.attr}}
+    pool:
+      vmImage: $(imageName)
+    variables:
+      BASH_ENV: ~/.bashenv
+    strategy:
+      matrix:
+        mojave:
+          imageName: macOS-10.14
+        high_sierra:
+          imageName: macOS-10.13
+    steps:
+    - checkout: self
+      fetchDepth: 20
+    - bash: sh <(curl https://nixos.org/releases/nix/nix-2.2.1/install) --no-daemon
+      displayName: nix install
+    - bash: |
+        sudo mkdir /etc/nix &&
+        sudo tee -a /etc/nix/nix.conf <<EOF
+        cores = 0
+        max-jobs = 6
+        EOF
+        tee -a $(BASH_ENV) <<EOF
+          source $HOME/.nix-profile/etc/profile.d/nix.sh
+        EOF
+      displayName: nix environment
+    - bash: |
+        nix-build . -A cachix
+        nix run -f . cachix -c cachix use arc
+      displayName: cachix use
+      continueOnError: true
+    - bash: |
+        nix-build --show-trace -E 'with import ./. {}; ${{crate.attr}}.overrideAttrs(old: {dirty=true;})'
+      displayName: build dirty
+    - bash: |
+        for bin in $(find result/bin -type f -executable); do
+          ls -l $bin
+          $bin --help
+        done
+      displayName: run dirty
+      continueOnError: true
+    - bash: |
+        nix-build --show-trace . -A ${{crate.attr}}
+      displayName: build
+    - bash: |
+        for bin in $(find result/bin -type f -executable); do
+          ls -l $bin
+          $bin --help
+        done
+      displayName: run
+      continueOnError: true
