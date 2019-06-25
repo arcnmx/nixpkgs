@@ -12,7 +12,7 @@
       lib.lists.foldl' (opts: opt: opts + " " + opt)
         (if release then "-C opt-level=3" else "-C debuginfo=2")
         (["-C codegen-units=$NIX_BUILD_CORES"] ++ extraRustcOpts);
-    rustcMeta = "-C metadata=${metadata} -C extra-filename=-${metadata}";
+    rustcMeta = "-C metadata=${metadata}";
 
     # Some platforms have different names for rustc.
     rustPlatform =
@@ -49,9 +49,9 @@
          --emit=dep-info,link -L dependency=target/deps ${deps} --cap-lints allow \
          $BUILD_OUT_DIR $EXTRA_BUILD $EXTRA_FEATURES --color ${colors}
 
-       EXTRA_LIB=" --extern $CRATE_NAME=target/lib/lib$CRATE_NAME-${metadata}.rlib"
-       if [ -e target/deps/lib$CRATE_NAME-${metadata}${stdenv.hostPlatform.extensions.sharedLibrary} ]; then
-          EXTRA_LIB="$EXTRA_LIB --extern $CRATE_NAME=target/lib/lib$CRATE_NAME-${metadata}${stdenv.hostPlatform.extensions.sharedLibrary}"
+       EXTRA_LIB=" --extern $CRATE_NAME=target/lib/lib$CRATE_NAME.rlib"
+       if [ -e target/deps/lib$CRATE_NAME${stdenv.hostPlatform.extensions.sharedLibrary} ]; then
+          EXTRA_LIB="$EXTRA_LIB --extern $CRATE_NAME=target/lib/lib$CRATE_NAME${stdenv.hostPlatform.extensions.sharedLibrary}"
        fi
     }
 

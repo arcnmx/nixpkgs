@@ -17,9 +17,9 @@ let
       (lib.concatMapStringsSep " " (dep:
         let extern = lib.strings.replaceStrings ["-"] ["_"] dep.libName; in
         (if lib.lists.any (x: x == "lib") dep.crateType then
-           " --extern ${extern}=${dep.out}/lib/lib${extern}-${dep.metadata}.rlib"
+           " --extern ${extern}=${dep.out}/lib/lib${extern}.rlib"
          else
-           " --extern ${extern}=${dep.out}/lib/lib${extern}-${dep.metadata}${stdenv.hostPlatform.extensions.sharedLibrary}")
+           " --extern ${extern}=${dep.out}/lib/lib${extern}${stdenv.hostPlatform.extensions.sharedLibrary}")
       ) dependencies);
 
     echo_build_heading = colors: ''

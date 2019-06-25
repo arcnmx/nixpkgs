@@ -8,6 +8,7 @@ crateName: metadata:
   if [[ -s target/link.final ]]; then
     cp target/link.final $out/lib/link
   fi
+  echo ${metadata} > $out/lib/metadata
   if [[ -d target/lib ]]; then
     find target/lib \
       -maxdepth 1 \
