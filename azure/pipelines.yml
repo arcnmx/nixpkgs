@@ -1,0 +1,28 @@
+resources:
+  repositories:
+  - repository: ci
+    type: github
+    name: arcnmx/ci
+    ref: refs/heads/master
+    endpoint: github/arcnmx/ci
+variables:
+  CI_ALLOW_ROOT: true
+  CI_CLOSE_STDIN: true # why does azure do this...
+  TERM: linux
+pool:
+  vmImage: $(imageName)
+strategy:
+  matrix:
+    mojave:
+      imageName: macOS-10.14
+    high_sierra:
+      imageName: macOS-10.13
+    linux:
+      imageName: ubuntu-latest
+steps:
+- template: azure/nix/install.yml@ci
+  parameters:
+    config: azure/ci.nix
+    ciVersion: master
+- bash: nix-build . -A python3.pkgs.pyscard
+  displayName: nix build
