@@ -35,6 +35,14 @@ in
         `(modulesPath + "/virtualisation/digital-ocean-config.nix")`.
       '';
     };
+
+    virtualisation.digitalOceanImage.compressionMethod = mkOption {
+      type = types.enum [ "gzip" "bzip2" ];
+      default = "gzip";
+      description = ''
+        Disk image compression method.
+      '';
+    };
   };
 
   #### implementation
@@ -43,8 +51,13 @@ in
     system.build.digitalOceanImage = import ../../lib/make-disk-image.nix {
       name = "digital-ocean-image";
       format = "qcow2";
-      postVM = ''
-        ${pkgs.gzip}/bin/gzip $diskImage
+      postVM = let
+        compress = {
+          "gzip" = "${pkgs.gzip}/bin/gzip";
+          "bzip2" = "${pkgs.bzip2}/bin/bzip2";
+        }.${cfg.compressionMethod};
+      in ''
+        ${compress} $diskImage
       '';
       configFile = if isNull cfg.configFile then defaultConfigFile else cfg.configFile;
       inherit (cfg) diskSize;
