@@ -134,8 +134,9 @@ with lib;
         script = ''
           set -e
           TEMPDIR=$(mktemp -d)
-          curl --retry-connrefused http://169.254.169.254/metadata/v1/vendor-data | munpack -C $TEMPDIR
-          $TEMPDIR/entropy-seed
+          curl --retry-connrefused http://169.254.169.254/metadata/v1/vendor-data | munpack -tC $TEMPDIR
+          ENTROPY_SEED=$(grep -rl "DigitalOcean Entropy Seed script" $TEMPDIR)
+          ${pkgs.runtimeShell} $ENTROPY_SEED
           rm -rf $TEMPDIR
           '';
         unitConfig = {
