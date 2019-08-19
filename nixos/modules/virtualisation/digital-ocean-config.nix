@@ -63,15 +63,14 @@ with lib;
         enable = cfg.setRootPassword;
         path = [ pkgs.curl pkgs.shadow pkgs.jq ];
         description = "Set root password provided by Digitalocean";
-        wantedBy = [ "multi-user.target" ];
+        wantedBy = [ "network.target" ];
         script = ''
           set -e
           ROOT_PASSWORD=$(curl --retry-connrefused http://169.254.169.254/metadata/v1.json | jq -r '.auth_key')
           echo "root:$ROOT_PASSWORD" | chpasswd
           '';
         unitConfig = {
-          After = [ "network-online.target" ];
-          Wants = [ "network-online.target" ];
+          After = [ "network.target" ];
         };
         serviceConfig = {
           Type = "oneshot";
@@ -84,15 +83,14 @@ with lib;
         enable = hostName == "";
         path = [ pkgs.curl pkgs.nettools ];
         description = "Set hostname provided by Digitalocean";
-        wantedBy = [ "multi-user.target" ];
+        wantedBy = [ "network.target" ];
         script = ''
           set -e
           DIGITALOCEAN_HOSTNAME=$(curl --retry-connrefused http://169.254.169.254/metadata/v1/hostname)
           hostname $DIGITALOCEAN_HOSTNAME
         '';
         unitConfig = {
-          After =  [ "network-online.target" ];
-          Wants = [ "network-online.target" ];
+          After =  [ "network.target" ];
         };
         serviceConfig = {
           Type = "oneshot";
@@ -103,7 +101,7 @@ with lib;
       systemd.services.digitalocean-ssh-keys = {
         enable = cfg.setSshKeys;
         description = "Set root ssh keys provided by Digital Ocean";
-        wantedBy = [ "multi-user.target" ];
+        wantedBy = [ "network.target" ];
         path = [ pkgs.curl ];
         script = ''
           set -e
@@ -117,8 +115,7 @@ with lib;
         };
         unitConfig = {
           ConditionFileExists = "!/root/.ssh/authorized_keys";
-          After =  [ "network-online.target" ];
-          Wants = [ "network-online.target" ];
+          After =  [ "network.target" ];
         };
       };
 
@@ -128,7 +125,7 @@ with lib;
       systemd.services.digitalocean-entropy-seed = {
         enable = cfg.seedEntropy;
         description = "Run the kernel RNG entropy seeding script from the Digital Ocean vendor data";
-        wantedBy = [ "multi-user.target" ];
+        wantedBy = [ "network.target" ];
         path = [ pkgs.curl pkgs.mpack ];
         script = ''
           set -e
@@ -139,8 +136,7 @@ with lib;
           rm -rf $TEMPDIR
           '';
         unitConfig = {
-          After = [ "network-online.target" ];
-          Wants = [ "network-online.target" ];
+          After = [ "network.target" ];
         };
         serviceConfig = {
           Type = "oneshot";
