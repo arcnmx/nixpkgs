@@ -28,6 +28,7 @@ in {
         ConditionFileExists = "!/etc/nixos/configuration.nix";
         After = [ "network-online.target" ];
         Wants = [ "network-online.target" ];
+        X-StopOnRemoval = false;
       };
       serviceConfig = {
         Type = "oneshot";
