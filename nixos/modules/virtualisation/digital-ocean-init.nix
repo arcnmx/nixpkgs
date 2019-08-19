@@ -1,6 +1,16 @@
 { config, pkgs, lib, ... }:
 with lib;
-{
+let
+  defaultConfigFile = pkgs.writeText "configuration.nix" ''
+    { modulesPath, ... }:
+    {
+      imports = [
+        ./do-userdata.nix
+        (modulesPath + "/virtualisation/digital-ocean-config.nix")
+      ];
+    }
+  '';
+in {
   options.virtualisation.digitalOcean.rebuildFromUserData = mkOption {
     type = bool;
     enable = true;
@@ -45,7 +55,8 @@ with lib;
             fi
 
             echo "setting configuration from Digital Ocean user data"
-            cp "$userData" /etc/nixos/configuration.nix
+            cp "$userData" /etc/nixos/do-userdata.nix
+            install -m0644 ${defaultConfigFile} /etc/nixos/configuration.nix
           else
             echo "user data does not appear to be a Nix expression; ignoring"
             exit
