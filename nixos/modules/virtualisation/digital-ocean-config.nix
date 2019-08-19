@@ -47,14 +47,13 @@ with lib;
         };
       };
       services.openssh = {
-        enable = true;
-        permitRootLogin = "prohibit-password";
+        enable = mkDefault true;
         passwordAuthentication = mkDefault false;
       };
       networking = {
         firewall.allowedTCPPorts = [ 22 ];
         hostName = mkDefault ""; # use Digital Ocean metadata server
-        useNetworkd = true;
+        useNetworkd = mkDefault true;
       };
 
       /* Fetch the root password from the digital ocean metadata.

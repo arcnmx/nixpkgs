@@ -1,6 +1,7 @@
 { config, pkgs, lib, ... }:
 with lib;
 let
+  cfg = config.virtualisation.digitalOcean;
   defaultConfigFile = pkgs.writeText "configuration.nix" ''
     { modulesPath, ... }:
     {
@@ -12,14 +13,15 @@ let
   '';
 in {
   options.virtualisation.digitalOcean.rebuildFromUserData = mkOption {
-    type = bool;
-    enable = true;
+    type = types.bool;
+    default = true;
     example = true;
     description = "Whether to reconfigure the system from Digital Ocean user data";
   };
 
   config = {
     systemd.services.digital-ocean-init = {
+      enable = cfg.rebuildFromUserData;
       description = "Reconfigure the system from Digital Ocean uesrdata on startup";
       wantedBy = [ "multi-user.target" ];
       unitConfig = {
