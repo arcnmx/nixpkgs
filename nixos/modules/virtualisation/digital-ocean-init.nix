@@ -20,7 +20,7 @@ in {
   };
 
   config = {
-    systemd.services.digital-ocean-init = {
+    systemd.services.digitalocean-init = {
       enable = cfg.rebuildFromUserData;
       description = "Reconfigure the system from Digital Ocean uesrdata on startup";
       wantedBy = [ "multi-user.target" ];
