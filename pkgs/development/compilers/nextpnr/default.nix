@@ -35,6 +35,7 @@ with stdenv; mkDerivation rec {
   enableParallelBuilding = true;
   cmakeFlags =
     [ "-DARCH=generic;ice40;ecp5"
+      "-DBUILD_TESTS=ON"
       "-DICEBOX_ROOT=${icestorm}/share/icebox"
       "-DTRELLIS_ROOT=${trellis}/share/trellis"
       "-DPYTRELLIS_LIBDIR=${trellis}/lib/trellis"
@@ -55,6 +56,8 @@ with stdenv; mkDerivation rec {
       --replace 'git log -1 --format=%h' 'echo ${substring 0 11 src.rev}'
   '';
 
+  doCheck = true;
+  checkTarget = "test";
 
   postFixup = lib.optionalString enableGui ''
     wrapQtApp $out/bin/nextpnr-generic
