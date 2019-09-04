@@ -19,14 +19,14 @@
 
 buildPythonPackage rec {
   pname = "nmigen";
-  version = "unstable-2019-08-31";
+  version = "unstable-2019-09-03";
   realVersion = lib.substring 0 7 src.rev;
 
   src = fetchFromGitHub {
     owner = "m-labs";
     repo = "nmigen";
-    rev = "2e206220462c67aa6ae97f7515a2191440fd61b3";
-    sha256 = "0y3w6vd493jqm9b8ppgwzs02v1al8w1n5gylljlsw70ci7fyk4qa";
+    rev = "943ce317af2f6b1afc0d6612d2eb1d1062ec2a88";
+    sha256 = "0pnhy7q4yr75phhkq0q5s4jqn8y96vv6k3i21img5ipn6hk4hhpc";
   };
 
   disabled = pythonOlder "3.6";
