@@ -14,13 +14,14 @@ let
 in
 with stdenv; mkDerivation rec {
   pname = "nextpnr";
-  version = "2019.08.31";
+  version = "2019.09.03";
 
   src = fetchFromGitHub {
     owner  = "yosyshq";
     repo   = "nextpnr";
-    rev    = "c0b7379e8672b6263152d5e340e62f22179fdc8b";
-    sha256 = "174n962xiwyzy53cn192h9rq95h951k3xy6bs43p5ya592ai5mjh";
+    rev    = "c0f02563e8908f28aa8eaa5eef2b886c0a27a2ab";
+    sha256 = "15rlqng4v3wki1hryz7r102fpzk9jhjxcc153l0rr9pn3cy6l4vm";
+    fetchSubmodules = true;
   };
 
   nativeBuildInputs
