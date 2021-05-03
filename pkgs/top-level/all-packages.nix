@@ -23227,9 +23227,7 @@ in
   };
 
   firefox-bin = wrapFirefox firefox-bin-unwrapped {
-    browserName = "firefox";
     pname = "firefox-bin";
-    desktopName = "Firefox";
   };
 
   firefox-beta-bin-unwrapped = firefox-bin-unwrapped.override {
@@ -23238,7 +23236,6 @@ in
   };
 
   firefox-beta-bin = res.wrapFirefox firefox-beta-bin-unwrapped {
-    browserName = "firefox";
     pname = "firefox-beta-bin";
     desktopName = "Firefox Beta";
   };
@@ -23249,7 +23246,6 @@ in
   };
 
   firefox-devedition-bin = res.wrapFirefox firefox-devedition-bin-unwrapped {
-    browserName = "firefox";
     nameSuffix = "-devedition";
     pname = "firefox-devedition-bin";
     desktopName = "Firefox DevEdition";
