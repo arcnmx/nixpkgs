@@ -17,6 +17,7 @@
 
 # for determining the latest compatible linuxPackages
 , linuxPackages_5_13
+, fetchpatch
 }:
 
 with lib;
@@ -43,7 +44,11 @@ let
         inherit rev sha256;
       };
 
-      patches = extraPatches;
+      patches = extraPatches ++
+      optional (buildKernel && versionAtLeast kernel.version "5.14") (fetchpatch {
+        url = "https://github.com/openzfs/zfs/pull/12409.patch";
+        sha256 = "0hjyj803y2ibkikpzf3dh96m34xv96x8215i4yv1np6cjdm7g44g";
+      });
 
       postPatch = optionalString buildKernel ''
         patchShebangs scripts
@@ -210,7 +215,7 @@ in {
 
   zfsUnstable = common {
     # check the release notes for compatible kernels
-    kernelCompatible = kernel.kernelAtLeast "3.10" && kernel.kernelOlder "5.14";
+    kernelCompatible = kernel.kernelAtLeast "3.10" && kernel.kernelOlder "5.15";
     latestCompatibleLinuxPackages = linuxPackages_5_13;
 
     # this package should point to a version / git revision compatible with the latest kernel release
