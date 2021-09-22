@@ -6,6 +6,7 @@
 # some packages need to be compiled with cmake
 , cmake
 , installShellFiles
+, fetchpatch
 }:
 
 stdenv.mkDerivation rec {
@@ -19,7 +20,14 @@ stdenv.mkDerivation rec {
     sha256 = "0viiafmb8binksda79ah828q1dfnb6jsqlk7vyndl2xvx9yfn4y2";
   };
 
-  patches = [ ./darwin-3.1.3.patch ];
+  patches = [
+    ./darwin-3.1.3.patch
+    (fetchpatch {
+      name = "fix-lua-5.4.patch";
+      url = "https://github.com/luarocks/luarocks/pull/1088.patch";
+      sha256 = "0skzdsbvqlgjgfhj9a7wsmgr2849gg7hczkwgkiyf33kvyi15as5";
+    })
+  ];
 
   postPatch = lib.optionalString stdenv.targetPlatform.isDarwin ''
     substituteInPlace src/luarocks/core/cfg.lua --subst-var-by 'darwinMinVersion' '${stdenv.targetPlatform.darwinMinVersion}'
