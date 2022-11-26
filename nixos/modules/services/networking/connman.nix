@@ -40,6 +40,14 @@ in {
         '';
       };
 
+      enableWaitOnline = mkOption {
+        type = types.bool;
+        default = true;
+        description = lib.mdDoc ''
+          Whether to include ConnMan in network-online.target
+        '';
+      };
+
       extraConfig = mkOption {
         type = types.lines;
         default = "";
@@ -120,6 +128,11 @@ in {
           ++ map toString cfg.extraFlags)
         ];
       };
+    };
+
+    systemd.services.connman-wait-online = {
+      enable = cfg.enableWaitOnline;
+      wantedBy = [ "network-online.target" ];
     };
 
     systemd.services.connman-vpn = {
