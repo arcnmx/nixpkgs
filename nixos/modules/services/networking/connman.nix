@@ -167,6 +167,8 @@ in {
     systemd.services.connman-wait-online = {
       inherit (cfg.waitOnline) enable;
       wantedBy = [ "network-online.target" ];
+      stopIfChanged = false;
+      restartIfChanged = false;
       serviceConfig.ExecStart = [
         ""
         "${cfg.package}/sbin/connmand-wait-online ${utils.escapeSystemdExecArgs cfg.waitOnline.extraArgs}"
@@ -178,6 +180,8 @@ in {
       conflicts = [ "shutdown.target" ];
       requisite = [ "connman.service" ];
       after = [ "connman.service" ];
+      stopIfChanged = false;
+      restartIfChanged = false;
       unitConfig.DefaultDependencies = false;
       serviceConfig = {
         Type = "oneshot";
