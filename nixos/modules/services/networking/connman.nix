@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, utils, ... }:
 
 with pkgs;
 with lib;
@@ -67,6 +67,43 @@ in {
         };
       };
 
+      waitOnline = {
+        enable = mkOption {
+          type = types.bool;
+          default = true;
+          description = lib.mdDoc ''
+            Whether to include ConnMan in network-online.target
+          '';
+        };
+
+        ignoredInterfaces = mkOption {
+          description = lib.mdDoc ''
+            Network interfaces to be ignored when deciding if the system is online.
+          '';
+          type = with types; listOf str;
+          default = [];
+          example = [ "wg0" ];
+        };
+
+        timeout = mkOption {
+          description = lib.mdDoc ''
+            Time to wait for the network to come online, in seconds. Set to 0 to disable.
+          '';
+          type = types.ints.unsigned;
+          default = 120;
+          example = 0;
+        };
+
+        extraArgs = mkOption {
+          description = lib.mdDoc ''
+            Extra command-line arguments to pass to connmand-wait-online.
+            These also affect per-interface `connmand-wait-online@` services.
+          '';
+          type = with types; listOf str;
+          default = [];
+        };
+      };
+
       extraFlags = mkOption {
         type = with types; listOf str;
         default = [ ];
@@ -90,8 +127,13 @@ in {
 
   ###### implementation
 
-  config = mkIf cfg.enable {
+  config = mkMerge [ {
 
+    services.connman.waitOnline.extraArgs =
+      [ "--timeout=${toString cfg.waitOnline.timeout}" ]
+      ++ map (i: "--ignore=${i}") cfg.waitOnline.ignoredInterfaces;
+
+  } (mkIf cfg.enable {
     assertions = [{
       assertion = !config.networking.useDHCP;
       message = "You can not use services.connman with networking.useDHCP";
@@ -119,6 +161,28 @@ in {
           ] ++ optional enableIwd "--wifi=iwd_agent"
           ++ map toString cfg.extraFlags)
         ];
+      };
+    };
+
+    systemd.services.connman-wait-online = {
+      inherit (cfg.waitOnline) enable;
+      wantedBy = [ "network-online.target" ];
+      serviceConfig.ExecStart = [
+        ""
+        "${cfg.package}/sbin/connmand-wait-online ${utils.escapeSystemdExecArgs cfg.waitOnline.extraArgs}"
+      ];
+    };
+
+    systemd.services."connman-wait-online@" = {
+      description = "Wait for network interface %I to be configured by ConnMan";
+      conflicts = [ "shutdown.target" ];
+      requisite = [ "connman.service" ];
+      after = [ "connman.service" ];
+      unitConfig.DefaultDependencies = false;
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+        ExecStart = "${cfg.package}/sbin/connmand-wait-online -i %I ${utils.escapeSystemdExecArgs cfg.waitOnline.extraArgs}";
       };
     };
 
@@ -151,5 +215,5 @@ in {
       };
       networkmanager.enable = false;
     };
-  };
+  }) ];
 }
