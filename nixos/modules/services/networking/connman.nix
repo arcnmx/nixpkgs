@@ -103,37 +103,30 @@ in {
     }];
 
     environment.systemPackages = [ cfg.package ];
+    systemd.packages = [ cfg.package ];
 
     systemd.services.connman = {
-      description = "Connection service";
       wantedBy = [ "multi-user.target" ];
       after = [ "syslog.target" ] ++ optional enableIwd "iwd.service";
       requires = optional enableIwd "iwd.service";
       serviceConfig = {
-        Type = "dbus";
-        BusName = "net.connman";
-        Restart = "on-failure";
-        ExecStart = toString ([
-          "${cfg.package}/sbin/connmand"
-          "--config=${configFile}"
-          "--nodaemon"
-        ] ++ optional enableIwd "--wifi=iwd_agent"
-          ++ cfg.extraFlags);
-        StandardOutput = "null";
+        ExecStart = [
+          ""
+          ([
+            "${cfg.package}/sbin/connmand"
+            "--config=${configFile}"
+            "--nodaemon"
+          ] ++ optional enableIwd "--wifi=iwd_agent"
+          ++ map toString cfg.extraFlags)
+        ];
       };
     };
 
-    systemd.services.connman-vpn = mkIf cfg.enableVPN {
-      description = "ConnMan VPN service";
+    systemd.services.connman-vpn = {
+      enable = cfg.enableVPN;
       wantedBy = [ "multi-user.target" ];
       after = [ "syslog.target" ];
       before = [ "connman.service" ];
-      serviceConfig = {
-        Type = "dbus";
-        BusName = "net.connman.vpn";
-        ExecStart = "${cfg.package}/sbin/connman-vpnd -n";
-        StandardOutput = "null";
-      };
     };
 
     systemd.services.net-connman-vpn = mkIf cfg.enableVPN {
