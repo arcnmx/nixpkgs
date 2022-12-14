@@ -46,10 +46,10 @@ with pkgs;
 
   cross = callPackage ./cross {};
 
-  php = recurseIntoAttrs (callPackages ./php {});
+  php = callPackages ./php {};
 
   rustCustomSysroot = callPackage ./rust-sysroot {};
-  buildRustCrate = callPackage ../build-support/rust/build-rust-crate/test { };
+  buildRustCrate = (callPackage ../build-support/rust/build-rust-crate/test { }).tests;
   importCargoLock = callPackage ../build-support/rust/test/import-cargo-lock { };
 
   vim = callPackage ./vim {};

@@ -1,6 +1,6 @@
-{ testers, fetchFirefoxAddon, fetchurl, ... }:
+{ lib, testers, fetchFirefoxAddon, fetchurl, ... }:
 
-{
+lib.recurseIntoAttrs {
   simple = testers.invalidateFetcherByDrvHash fetchFirefoxAddon {
     name = "image-search-options";
     # Chosen because its only 147KB

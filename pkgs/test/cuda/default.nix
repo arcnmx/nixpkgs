@@ -1,6 +1,6 @@
-{ callPackage }:
+{ lib, callPackage }:
 
-rec {
+lib.recurseIntoAttrs rec {
   cuda-samplesPackages = callPackage ./cuda-samples { };
   inherit (cuda-samplesPackages)
     cuda-samples_cudatoolkit_10

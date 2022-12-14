@@ -1,6 +1,6 @@
 { lib, runCommand, fetchurl, file, texlive, writeShellScript }:
 
-{
+lib.recurseIntoAttrs {
   chktex = runCommand "texlive-test-chktex" {
     nativeBuildInputs = [
       (with texlive; combine { inherit scheme-infraonly chktex; })

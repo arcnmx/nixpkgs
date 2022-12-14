@@ -1,8 +1,8 @@
-{ callPackage }:
+{ lib, callPackage }:
 
 # Build like this from nixpkgs root:
 # $ nix-build -A tests.importCargoLock
-{
+lib.recurseIntoAttrs {
   basic = callPackage ./basic { };
   basicDynamic = callPackage ./basic-dynamic { };
   gitDependency = callPackage ./git-dependency { };

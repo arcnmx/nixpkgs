@@ -28,7 +28,7 @@ let
 
   check = cond: if cond then "ok" else "nok";
 in
-{
+lib.recurseIntoAttrs {
   withExtensions-enables-previously-disabled-extensions = runTest "php-test-withExtensions-enables-previously-disabled-extensions" ''
     php="${php}"
 

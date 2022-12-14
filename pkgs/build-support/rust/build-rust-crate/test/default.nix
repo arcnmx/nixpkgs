@@ -553,7 +553,7 @@ let
       buildRustCrate = null;
     };
     tests = lib.mapAttrs (key: value: mkTest (value // lib.optionalAttrs (!value?crateName) { crateName = key; })) cases;
-  in tests // rec {
+  in lib.recurseIntoAttrs tests // rec {
 
     crateBinWithPathOutputs = assertOutputs {
       name="crateBinWithPath";

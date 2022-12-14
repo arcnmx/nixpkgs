@@ -1,4 +1,4 @@
-{ testers, fetchurl, jq, moreutils, ... }: {
+{ lib, testers, fetchurl, jq, moreutils, ... }: lib.recurseIntoAttrs {
   # Tests that we can send custom headers with spaces in them
   header =
     let headerValue = "Test '\" <- These are some quotes";

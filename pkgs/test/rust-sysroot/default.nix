@@ -47,7 +47,7 @@ let
     "features" = "-mmx,-sse,+soft-float";
   };
 
-in {
+in lib.recurseIntoAttrs {
   blogOS-targetByFile = mkBlogOsTest (builtins.toFile "x86_64-blog_os.json" (builtins.toJSON targetContents));
   blogOS-targetByNix = let
     plat = lib.systems.elaborate { config = "x86_64-none"; } // {

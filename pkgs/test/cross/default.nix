@@ -107,7 +107,7 @@ let
     '';
   };
 
-in {
-  gcc = (lib.mapAttrs (_: mapMultiPlatformTest (system: system // {useLLVM = false;})) tests);
-  llvm = (lib.mapAttrs (_: mapMultiPlatformTest (system: system // {useLLVM = true;})) tests);
+in lib.recurseIntoAttrs {
+  gcc = lib.recurseIntoAttrs (lib.mapAttrs (_: mapMultiPlatformTest (system: system // {useLLVM = false;})) tests);
+  llvm = lib.recurseIntoAttrs (lib.mapAttrs (_: mapMultiPlatformTest (system: system // {useLLVM = true;})) tests);
 }

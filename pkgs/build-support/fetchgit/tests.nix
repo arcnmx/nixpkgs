@@ -1,6 +1,6 @@
-{ testers, fetchgit, ... }:
+{ lib, testers, fetchgit, ... }:
 
-{
+lib.recurseIntoAttrs {
   simple = testers.invalidateFetcherByDrvHash fetchgit {
     name = "nix-source";
     url = "https://github.com/NixOS/nix";
