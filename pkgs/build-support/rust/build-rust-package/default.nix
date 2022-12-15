@@ -1,6 +1,7 @@
 { lib
 , importCargoLock
 , fetchCargoTarball
+, buildSysroot
 , rust
 , stdenv
 , callPackage
@@ -44,9 +45,6 @@
 , useNextest ? false
 , depsExtraArgs ? {}
 
-# Toggles whether a custom sysroot is created when the target is a .json file.
-, __internal_dontAddSysroot ? false
-
 # Needed to `pushd`/`popd` into a subdir of a tarball if this subdir
 # contains a Cargo.toml, but isn't part of a workspace (which is e.g. the
 # case for `rustfmt`/etc from the `rust-sources).
@@ -74,32 +72,26 @@ let
       sha256 = args.cargoSha256;
     } // depsExtraArgs);
 
-  target = rust.toRustTargetSpec stdenv.hostPlatform;
+  hostTarget = rust.toRustTargetSpec stdenv.hostPlatform;
+  target = args.target or hostTarget;
   targetIsJSON = lib.hasSuffix ".json" target;
-  useSysroot = targetIsJSON && !__internal_dontAddSysroot;
+  useSysroot = args ? sysroot || (target != hostTarget && targetIsJSON);
 
-  # see https://github.com/rust-lang/cargo/blob/964a16a28e234a3d397b2a7031d4ab4a428b1391/src/cargo/core/compiler/compile_kind.rs#L151-L168
-  # the "${}" is needed to transform the path into a /nix/store path before baseNameOf
-  shortTarget = if targetIsJSON then
-      (lib.removeSuffix ".json" (builtins.baseNameOf "${target}"))
-    else target;
-
-  sysroot = callPackage ./sysroot { } {
-    inherit target shortTarget;
+  customSysroot = buildSysroot {
+    inherit target;
     RUSTFLAGS = args.RUSTFLAGS or "";
     originalCargoToml = src + /Cargo.toml; # profile info is later extracted
   };
 
 in
 
-# Tests don't currently work for `no_std`, and all custom sysroots are currently built without `std`.
-# See https://os.phil-opp.com/testing/ for more information.
-assert useSysroot -> !(args.doCheck or true);
-
-stdenv.mkDerivation ((removeAttrs args [ "depsExtraArgs" "cargoUpdateHook" "cargoLock" ]) // lib.optionalAttrs useSysroot {
-  RUSTFLAGS = "--sysroot ${sysroot} " + (args.RUSTFLAGS or "");
+stdenv.mkDerivation (removeAttrs args [ "depsExtraArgs" "cargoUpdateHook" "cargoLock" ] // lib.optionalAttrs useSysroot rec {
+  rustSysroot = args.sysroot or customSysroot;
+  #cargoBuildTargetName = rustSysroot.target;
 } // {
   inherit buildAndTestSubdir cargoDeps;
+
+  cargoBuildTarget = target;
 
   cargoBuildType = buildType;
 
@@ -145,6 +137,7 @@ stdenv.mkDerivation ((removeAttrs args [ "depsExtraArgs" "cargoUpdateHook" "carg
   '';
 
   doCheck = args.doCheck or true;
+  dontCargoCheck = args.dontCargoCheck or (!useSysroot);
 
   strictDeps = true;
 

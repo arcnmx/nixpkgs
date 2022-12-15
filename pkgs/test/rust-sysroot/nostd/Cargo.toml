@@ -1,0 +1,4 @@
+[package]
+name = "nixpkgs-sysroot-test"
+version = "0.0.0"
+crate-type = "clib"

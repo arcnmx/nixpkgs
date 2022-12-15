@@ -1,5 +1,5 @@
 #!/usr/bin/env nix-shell
-#!nix-shell -i bash -p python3 python3.pkgs.toml cargo
+#!nix-shell -i bash -p python3 remarshal cargo
 
 set -eu pipefile
 
@@ -17,7 +17,7 @@ RUSTC_SRC=$(nix-build "${NIXPKGS_ROOT}" -A pkgs.rustPlatform.rustLibSrc --no-out
 ln -s $RUSTC_SRC/{core,alloc} ./
 
 export RUSTC_SRC
-python3 "$HERE/cargo.py"
+python3 "$HERE/cargo.py" | json2toml > Cargo.toml
 
 export RUSTC_BOOTSTRAP=1
 cargo generate-lockfile

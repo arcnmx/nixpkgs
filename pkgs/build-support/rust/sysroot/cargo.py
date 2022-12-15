@@ -1,7 +1,8 @@
 import os
-import toml
+import sys
+import json
 
-rust_src = os.environ['RUSTC_SRC']
+rust_src = os.environ["RUSTC_SRC"]
 orig_cargo = os.environ['ORIG_CARGO'] if 'ORIG_CARGO' in os.environ else None
 
 base = {
@@ -37,11 +38,10 @@ base = {
 
 if orig_cargo is not None:
   with open(orig_cargo, 'r') as f:
-    src = toml.loads(f.read())
+    src = json.loads(f.read())
     if 'profile' in src:
       base['profile'] = src['profile']
 
-out = toml.dumps(base)
+out = json.dumps(base)
 
-with open('Cargo.toml', 'x') as f:
-  f.write(out)
+sys.stdout.write(out)

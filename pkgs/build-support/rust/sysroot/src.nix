@@ -1,26 +1,48 @@
-{ lib, stdenv, rustPlatform, buildPackages
-, originalCargoToml ? null
-}:
+{ lib, stdenv, rustLibSrc, python3, remarshal }:
 
-stdenv.mkDerivation {
+{ rustPlatform ? { inherit rustLibSrc; }
+, profile ? if originalCargoToml != null
+    then (lib.importTOML originalCargoToml).profile or {}
+    else null
+, originalCargoToml ? null
+}: let
+
+  mapProfile = profile: builtins.toJSON {
+    inherit profile;
+  };
+
+in stdenv.mkDerivation {
   name = "cargo-src";
   preferLocalBuild = true;
+  nativeBuildInputs = [ python3 remarshal ];
+  cargoLock = ./Cargo.lock;
+  cargoPy = ./cargo.py;
+  RUSTC_SRC = rustPlatform.rustLibSrc;
+
+  cargoProfile = lib.mapNullable mapProfile profile;
+  originalCargoToml = if profile == null then originalCargoToml else null;
+  passAsFile = [ "cargoProfile" ];
 
   unpackPhase = "true";
   dontConfigure = true;
-  dontBuild = true;
+
+  configurePhase = ''
+    if [[ -n $originalCargoToml ]]; then
+      toml2json $originalCargoToml Cargo.json
+      export ORIG_CARGO=Cargo.json
+    elif [[ -n $cargoProfilePath ]]; then
+      export ORIG_CARGO=$cargoProfilePath
+    fi
+  '';
+
+  buildPhase = ''
+    python $cargoPy $rustLibSrc | json2toml > Cargo.toml
+  '';
 
   installPhase = ''
-    export RUSTC_SRC=${rustPlatform.rustLibSrc.override { }}
-  ''
-  + lib.optionalString (originalCargoToml != null) ''
-    export ORIG_CARGO=${originalCargoToml}
-  ''
-  + ''
-    ${buildPackages.python3.withPackages (ps: with ps; [ toml ])}/bin/python3 ${./cargo.py}
     mkdir -p $out/src
-    touch $out/src/lib.rs
-    cp Cargo.toml $out/Cargo.toml
-    cp ${./Cargo.lock} $out/Cargo.lock
+    echo '#![no_std]' > $out/src/lib.rs
+    mv Cargo.toml $out/
+    cp $cargoLock $out/Cargo.lock
   '';
 }

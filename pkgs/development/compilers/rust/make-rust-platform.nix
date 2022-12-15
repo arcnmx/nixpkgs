@@ -17,11 +17,20 @@ lib.makeExtensible (self: {
     inherit stdenv;
     inherit (self.rust) rustc;
     inherit (self) cargoBuildHook cargoCheckHook cargoInstallHook cargoNextestHook cargoSetupHook
-      fetchCargoTarball importCargoLock;
+      fetchCargoTarball importCargoLock
+      buildSysroot;
   };
 
   importCargoLock = buildPackages.callPackage ../../../build-support/rust/import-cargo-lock.nix {
     inherit (self.rust) cargo;
+  };
+
+  fetchSysrootSrc = buildPackages.callPackage ../../../build-support/rust/sysroot/src.nix {
+    inherit (self) rustLibSrc;
+  };
+
+  buildSysroot = callPackage ../../../build-support/rust/sysroot {
+    inherit (self) fetchSysrootSrc buildRustPackage;
   };
 
   rustcSrc = callPackage ./rust-src.nix {

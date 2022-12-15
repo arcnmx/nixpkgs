@@ -1,15 +1,11 @@
 declare -a cargoBuildFlags
 
-cargoBuildHook() {
-    echo "Executing cargoBuildHook"
-
-    runHook preBuild
+cargoPreBuildHook() {
+    echo "Executing cargoPreBuildHook"
 
     if [ ! -z "${buildAndTestSubdir-}" ]; then
         # ensure the output doesn't end up in the subdirectory
         export CARGO_TARGET_DIR="$(pwd)/target"
-
-        pushd "${buildAndTestSubdir}"
     fi
 
     if [ "${cargoBuildType}" != "debug" ]; then
@@ -23,16 +19,21 @@ cargoBuildHook() {
     if [ -n "${cargoBuildFeatures-}" ]; then
         cargoBuildFeaturesFlag="--features=${cargoBuildFeatures// /,}"
     fi
+}
+
+cargoBuildHook() {
+    echo "Executing cargoBuildHook"
+
+    runHook preBuild
+
+    if [ ! -z "${buildAndTestSubdir-}" ]; then
+        pushd "${buildAndTestSubdir}"
+    fi
 
     (
     set -x
-    env \
-      "CC_@rustBuildPlatform@=@ccForBuild@" \
-      "CXX_@rustBuildPlatform@=@cxxForBuild@" \
-      "CC_@rustTargetPlatform@=@ccForHost@" \
-      "CXX_@rustTargetPlatform@=@cxxForHost@" \
-      cargo build -j $NIX_BUILD_CORES \
-        --target @rustTargetPlatformSpec@ \
+    cargo build -j $NIX_BUILD_CORES \
+        --target "${cargoBuildTarget-@rustTargetPlatformSpec@}" \
         --frozen \
         ${cargoBuildProfileFlag} \
         ${cargoBuildNoDefaultFeaturesFlag} \
@@ -49,6 +50,10 @@ cargoBuildHook() {
     echo "Finished cargoBuildHook"
 }
 
+if [ -z "${dontCargoPreBuild-}" ]; then
+    preBuildHooks+=(cargoPreBuildHook)
+fi
+
 if [ -z "${dontCargoBuild-}" ] && [ -z "${buildPhase-}" ]; then
-  buildPhase=cargoBuildHook
+    buildPhase=cargoBuildHook
 fi

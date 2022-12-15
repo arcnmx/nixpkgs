@@ -30,6 +30,22 @@ cargoSetupPostUnpackHook() {
     @cargoConfig@
 EOF
 
+    rustBuildPlatform=@rustBuildPlatform@
+    rustTargetPlatform=${rustTargetPlatform-@rustTargetPlatform@}
+    rustTargetPlatformSpec=${rustTargetPlatformSpec-@rustTargetPlatformSpec@}
+    cargoBuildTarget=${cargoBuildTarget-rustTargetPlatformSpec}
+    cargoBuildTargetName=$(basename "${cargoBuildTarget%.json}")
+    cargoReleaseDir=target/$cargoBuildTargetName/$cargoBuildType
+
+    if [[ -n "${rustSysroot-}" ]]; then
+        export RUSTFLAGS="--sysroot $rustSysroot${RUSTFLAGS+ $RUSTFLAGS}"
+    fi
+
+    export "CC_${rustBuildPlatform//-/_}=@ccForBuild@" \
+        "CXX_${rustBuildPlatform//-/_}=@cxxForBuild@" \
+        "CC_${rustTargetPlatform//-/_}=@ccForHost@" \
+        "CXX_${rustTargetPlatform//-/_}=@cxxForHost@"
+
     echo "Finished cargoSetupPostUnpackHook"
 }
 

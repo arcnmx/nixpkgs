@@ -26,15 +26,14 @@ let
   cxxForHost = "${stdenv.cc}/bin/${stdenv.cc.targetPrefix}c++";
   rustBuildPlatform = rust.toRustTarget stdenv.buildPlatform;
   rustTargetPlatform = rust.toRustTarget stdenv.hostPlatform;
-  rustTargetPlatformSpec = rust.toRustTargetSpec stdenv.hostPlatform;
+  rustTargetPlatformSpec = target;
 in {
   cargoBuildHook = callPackage ({ }:
     makeSetupHook {
       name = "cargo-build-hook.sh";
       deps = [ cargo ];
       substitutions = {
-        inherit ccForBuild ccForHost cxxForBuild cxxForHost
-          rustBuildPlatform rustTargetPlatform rustTargetPlatformSpec;
+        inherit rustTargetPlatformSpec;
       };
     } ./cargo-build-hook.sh) {};
 
@@ -52,7 +51,6 @@ in {
       name = "cargo-install-hook.sh";
       deps = [ ];
       substitutions = {
-        inherit shortTarget;
       };
     } ./cargo-install-hook.sh) {};
 
@@ -61,7 +59,6 @@ in {
       name = "cargo-nextest-hook.sh";
       deps = [ cargo cargo-nextest ];
       substitutions = {
-        inherit rustTargetPlatformSpec;
       };
     } ./cargo-nextest-hook.sh) {};
 
@@ -70,6 +67,9 @@ in {
       name = "cargo-setup-hook.sh";
       deps = [ ];
       substitutions = {
+        inherit ccForBuild ccForHost cxxForBuild cxxForHost
+          rustBuildPlatform rustTargetPlatform rustTargetPlatformSpec;
+
         defaultConfig = ../fetchcargo-default-config.toml;
 
         # Specify the stdenv's `diff` by abspath to ensure that the user's build
@@ -116,8 +116,7 @@ in {
       name = "maturin-build-hook.sh";
       deps = [ cargo maturin rustc ];
       substitutions = {
-        inherit ccForBuild ccForHost cxxForBuild cxxForHost
-          rustBuildPlatform rustTargetPlatform rustTargetPlatformSpec;
+        inherit rustTargetPlatformSpec;
       };
     } ./maturin-build-hook.sh) {};
 

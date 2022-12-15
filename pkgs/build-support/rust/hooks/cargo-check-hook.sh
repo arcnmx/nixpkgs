@@ -1,14 +1,8 @@
 declare -a checkFlags
 declare -a cargoTestFlags
 
-cargoCheckHook() {
-    echo "Executing cargoCheckHook"
-
-    runHook preCheck
-
-    if [[ -n "${buildAndTestSubdir-}" ]]; then
-        pushd "${buildAndTestSubdir}"
-    fi
+cargoPreCheckHook() {
+    echo "Executing cargoPreCheckHook"
 
     if [[ -z ${dontUseCargoParallelTests-} ]]; then
         threads=$NIX_BUILD_CORES
@@ -28,14 +22,31 @@ cargoCheckHook() {
         cargoCheckFeaturesFlag="--features=${cargoCheckFeatures// /,}"
     fi
 
-    argstr="${cargoCheckProfileFlag} ${cargoCheckNoDefaultFeaturesFlag} ${cargoCheckFeaturesFlag}
-        --target @rustTargetPlatformSpec@ --frozen ${cargoTestFlags}"
+    if [ -z "${cargoCheckTarget-}" ]; then
+        cargoCheckTarget=${cargoBuildTarget-@rustTargetPlatformSpec@}
+    fi
+}
+
+cargoCheckHook() {
+    echo "Executing cargoCheckHook"
+
+    runHook preCheck
+
+    if [[ -n "${buildAndTestSubdir-}" ]]; then
+        pushd "${buildAndTestSubdir}"
+    fi
 
     (
         set -x
         cargo test \
               -j $NIX_BUILD_CORES \
-              ${argstr} -- \
+              --target "$cargoCheckTarget" \
+              --frozen \
+              ${cargoCheckProfileFlag} \
+              ${cargoCheckNoDefaultFeaturesFlag} \
+              ${cargoCheckFeaturesFlag}
+              ${cargoTestFlags} \
+              -- \
               --test-threads=${threads} \
               ${checkFlags} \
               ${checkFlagsArray+"${checkFlagsArray[@]}"}
@@ -49,6 +60,10 @@ cargoCheckHook() {
 
     runHook postCheck
 }
+
+if [ -z "${dontCargoPreCheck-}" ]; then
+    preCheckHooks+=(cargoPreCheckHook)
+fi
 
 if [ -z "${dontCargoCheck-}" ] && [ -z "${checkPhase-}" ]; then
   checkPhase=cargoCheckHook
