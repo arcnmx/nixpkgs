@@ -38,6 +38,10 @@
 
 # Skip wrapping of lua programs altogether
 , dontWrapLuaPrograms ? false
+
+, meta ? {}
+, passthru ? {}
+
 , doCheck ? false
 # Non-Lua / system (e.g. C library) dependencies. Is a list of deps, where
 # each dep is either a derivation, or an attribute set like
@@ -98,7 +102,8 @@ let
   buildInputs = let
     # example externalDeps': [ { name = "CRYPTO"; dep = pkgs.openssl; } ]
     externalDeps' = lib.filter (dep: !lib.isDerivation dep) self.externalDeps;
-    in [ lua.pkgs.luarocks ]
+    in buildInputs
+      ++ [ lua.pkgs.luarocks ]
       ++ lib.optionals self.doCheck ([ luarocksCheckHook ] ++ self.nativeCheckInputs)
       ++ (map (d: d.dep) externalDeps')
     ;
@@ -201,14 +206,12 @@ let
 
   passthru = {
     inherit lua; # The lua interpreter
-  };
+  } // passthru;
 
   meta = {
     platforms = lua.meta.platforms;
-    # add extra maintainer(s) to every package
-    maintainers = (attrs.meta.maintainers or []) ++ [ ];
     broken = disabled;
-  } // attrs.meta;
+  } // meta;
 }));
 in
   luarocksDrv
