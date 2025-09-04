@@ -1,0 +1,28 @@
+diff --git a/core/src/avm2/globals/flash/net/file_reference.rs b/core/src/avm2/globals/flash/net/file_reference.rs
+index efaaaa94b..e9b07915a 100644
+--- a/core/src/avm2/globals/flash/net/file_reference.rs
++++ b/core/src/avm2/globals/flash/net/file_reference.rs
+@@ -22,6 +22,7 @@ pub fn get_creation_date<'gc>(
+                 Value::Null
+             }
+         }
++        FileReference::FilePath(_) => unimplemented!(),
+     };
+ 
+     Ok(creation_date)
+@@ -64,6 +65,7 @@ pub fn get_modification_date<'gc>(
+                 Value::Null
+             }
+         }
++        FileReference::FilePath(_) => unimplemented!(),
+     };
+ 
+     Ok(modification_date)
+@@ -117,6 +119,7 @@ pub fn get_type<'gc>(
+             let type_ = dialog_result.file_type().unwrap_or_default();
+             AvmString::new_utf8(activation.context.gc_context, type_).into()
+         }
++        FileReference::FilePath(_) => unimplemented!(),
+     };
+ 
+     Ok(type_)

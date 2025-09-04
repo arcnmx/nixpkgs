@@ -1,0 +1,30 @@
+diff --git a/Makefile.am b/Makefile.am
+index e0cd8f105..38935a0dc 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -3,8 +3,7 @@ NULL =
+ ACLOCAL_AMFLAGS = -I m4
+ 
+ if ENABLE_SERVER
+-    IPASERVER_SUBDIRS = ipaserver ipasphinx
+-    SERVER_SUBDIRS = daemons init install
++    SERVER_SUBDIRS = daemons
+ endif
+ 
+ if WITH_IPATESTS
+diff --git a/daemons/Makefile.am b/daemons/Makefile.am
+index f8f3ed5b2..689db7162 100644
+--- a/daemons/Makefile.am
++++ b/daemons/Makefile.am
+@@ -9,11 +9,7 @@ noinst_HEADERS = ipa-version.h.in
+ 
+ SUBDIRS =			\
+ 	.			\
+-	dnssec			\
+-	ipa-kdb			\
+-	ipa-slapi-plugins	\
+ 	ipa-sam			\
+-	ipa-otpd		\
+ 	$(NULL)
+ 
+ ipa-version.h: ipa-version.h.in $(top_builddir)/$(CONFIG_STATUS)

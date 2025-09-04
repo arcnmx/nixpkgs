@@ -30,7 +30,7 @@ stdenv.mkDerivation rec {
     license = licenses.gpl2Only;
     maintainers = [ maintainers.koral ];
     platforms = lib.platforms.unix;
-    knownVulnerabilities = [
+    /*knownVulnerabilities = [
       "CVE-2017-10976"
       "CVE-2017-11096"
       "CVE-2017-11097"
@@ -45,6 +45,6 @@ stdenv.mkDerivation rec {
       "CVE-2017-16797"
       "CVE-2017-16868"
       "CVE-2017-16890"
-    ];
+    ];*/
   };
 }

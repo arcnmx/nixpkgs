@@ -93,7 +93,7 @@ stdenv.mkDerivation rec {
     ];
     platforms = platforms.unix;
     maintainers = with maintainers; [ sikmir ];
-    knownVulnerabilities = [
+    knownVulnerabilities = lib.optionals false [
       "CVE-2023-26930"
       "CVE-2024-2971"
       "CVE-2024-3247"

@@ -6,7 +6,7 @@
   wrapQtAppsHook,
   python3,
   zbar,
-  enableQt ? true,
+  enableQt ? false,
   callPackage,
   qtwayland,
 }:
@@ -71,8 +71,11 @@ python3.pkgs.buildPythonApplication rec {
   checkInputs =
     with python3.pkgs;
     lib.optionals enableQt [
-      pyqt6
+      #pyqt6
     ];
+  disabledTestPaths = lib.optionals (!enableQt) [
+    "tests/test_qml_types.py"
+  ];
 
   postPatch =
     if enableQt then
@@ -83,6 +86,8 @@ python3.pkgs.buildPythonApplication rec {
     else
       ''
         sed -i '/qdarkstyle/d' contrib/requirements/requirements.txt
+        #chmod +w tests
+        #rm tests/test_qml_types.py
       '';
 
   postInstall = lib.optionalString stdenv.hostPlatform.isLinux ''

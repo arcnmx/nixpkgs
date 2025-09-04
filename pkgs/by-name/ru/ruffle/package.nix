@@ -1,4 +1,5 @@
 {
+  fetchpatch,
   lib,
   stdenv,
   rustPlatform,
@@ -32,6 +33,14 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   cargoHash = "sha256-89xxPl6nIp4VLsQqsaXH9VKWX6Ehw6KCJaOuxnSxu0g=";
   cargoBuildFlags = lib.optional withRuffleTools "--workspace";
+
+  patches = [
+    (fetchpatch {
+      url = "https://github.com/ruffle-rs/ruffle/pull/14178.patch";
+      sha256 = "sha256-NlSfHw6HidevQ/9PdGDZaGgJSc5n95wBuF5QWQfNFjs=";
+    })
+    ./file.patch
+  ];
 
   env =
     let

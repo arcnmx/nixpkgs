@@ -166,7 +166,7 @@ let
                     mkdir -p $out/$(dirname $relFile)
                     cat <<WRAPPER > $out/$relFile
                 #!${runtimeShell}
-                exec "$file" "$@"
+                exec "$file" "\$@"
                 WRAPPER
                     chmod +x $out/$relFile
                   done

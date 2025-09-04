@@ -108,7 +108,7 @@ stdenv.mkDerivation {
 
   # gcc -DAC_BUILT -Wall vncpcap2john.o memdbg.o -g    -lpcap -fopenmp -o ../run/vncpcap2john
   # gcc: error: memdbg.o: No such file or directory
-  enableParallelBuilding = false;
+  enableParallelBuilding = true;
 
   postInstall = ''
     mkdir -p "$out/bin" "$out/etc/john" "$out/share/john" "$out/share/doc/john" "$out/share/john/rules" "$out/share/john/opencl" "$out/${perlPackages.perl.libPrefix}"
@@ -120,6 +120,8 @@ stdenv.mkDerivation {
     cp -vt "$out/share/john/opencl" ../run/opencl/*.cl ../run/opencl/*.h
     cp -vLrt "$out/share/doc/john" ../doc/*
     cp -vt "$out/${perlPackages.perl.libPrefix}" ../run/lib/*
+  '' + lib.optionalString withOpenCL ''
+    cp -vrt "$out/share/john" ../run/opencl
   '';
 
   postFixup = ''

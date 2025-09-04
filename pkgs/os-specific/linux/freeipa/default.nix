@@ -85,6 +85,7 @@ stdenv.mkDerivation rec {
       url = "https://github.com/freeipa/freeipa/pull/7619/commits/e2bf6e4091c7b5320ec6387dab2d5cabe4a9a42d.patch";
       hash = "sha256-AyMK0hjXMrFK4/qIcjPMFH9DKvnvYOK2QS83Otcc+l4=";
     })
+    ./enable-server.patch
   ];
 
   nativeBuildInputs = [
@@ -151,7 +152,7 @@ stdenv.mkDerivation rec {
   configureFlags = [
     "--with-systemdsystemunitdir=$out/lib/systemd/system"
     "--with-ipaplatform=nixos"
-    "--disable-server"
+    #"--disable-server"
   ];
 
   postInstall = ''

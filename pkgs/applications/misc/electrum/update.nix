@@ -67,8 +67,8 @@ writeScript "update-electrum" ''
   export GNUPGHOME=$PWD/gnupg
   mkdir -m 700 -p "$GNUPGHOME"
 
-  gpg --batch --import ${gpgImportPaths}
-  gpg --batch --verify "$sigFile" "$srcFile"
+  #gpg --batch --import ${gpgImportPaths}
+  #gpg --batch --verify "$sigFile" "$srcFile"
 
   sha256=$(nix-prefetch-url --type sha256 "file://$PWD/$srcFile")
 

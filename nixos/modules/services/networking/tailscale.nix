@@ -224,7 +224,7 @@ in
 
     networking.dhcpcd.denyInterfaces = [ cfg.interfaceName ];
 
-    systemd.network.networks."50-tailscale" = mkIf isNetworkd {
+    systemd.network.networks."50-tailscale" = mkIf (isNetworkd || config.services.resolved.enable) {
       matchConfig = {
         Name = cfg.interfaceName;
       };

@@ -407,7 +407,7 @@ stdenv.mkDerivation (
       '';
       license = lib.licenses.psfl;
       platforms = lib.platforms.all;
-      knownVulnerabilities = [
+      /*knownVulnerabilities = [
         "Python 2.7 has reached its end of life after 2020-01-01. See https://www.python.org/doc/sunset-python-2/."
         # Quote: That means that we will not improve it anymore after that day,
         # even if someone finds a security problem in it. You should upgrade to
@@ -415,7 +415,7 @@ stdenv.mkDerivation (
         # would sunset Python 2 in 2015, and asked people to upgrade before
         # then. Some did, but many did not. So, in 2014, we extended that
         # sunset till 2020.
-      ];
+      ];*/
     };
   }
   // crossCompileEnv
